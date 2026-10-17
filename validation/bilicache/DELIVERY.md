@@ -24,6 +24,6 @@ Windows ZIP 的逐文件哈希位于 `build/bilicache-release/SHA256.json`，实
 
 ## 尚待验收
 
-[原构建](https://github.com/XLforCode/NipaPlay-Reload/actions/runs/39009849077) 的 macOS libmpv 依赖准备已成功，Universal 应用构建中；[运行时修复版](https://github.com/XLforCode/NipaPlay-Reload/actions/runs/39011067681) 排队。任何旧提交包不能代替最终修复版。macOS 测试包保持沙盒，临时签名，未公证。
+[原构建](https://github.com/XLforCode/NipaPlay-Reload/actions/runs/39009849077) 的 macOS libmpv 依赖准备已成功缓存，随后停止旧应用打包，让[运行时修复版](https://github.com/XLforCode/NipaPlay-Reload/actions/runs/39011067681) 复用依赖缓存。任何旧提交包不能代替最终修复版。macOS 测试包保持沙盒，临时签名，未公证。
 
 真实 Chrome 目录授权/重启恢复、用户安装登记和配对，以及 macOS GUI、书签恢复、权限撤销均未实机验收。不能据此宣布双平台首版完成。
