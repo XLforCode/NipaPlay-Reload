@@ -23,10 +23,11 @@ typedef SingleInstanceMessageHandler = FutureOr<void> Function(
 );
 
 class SingleInstanceService {
-  static const String _appId = 'nipaplay';
+  // Keep the fork's bridge requests out of an already-running official build.
+  static const String _appId = 'nipaplay.bilicache';
   static const int _protocolVersion = 1;
-  static const String _lockFileName = 'nipaplay_instance.lock';
-  static const String _infoFileName = 'nipaplay_instance.json';
+  static const String _lockFileName = 'nipaplay_bilicache_instance.lock';
+  static const String _infoFileName = 'nipaplay_bilicache_instance.json';
   static const Duration _connectTimeout = Duration(milliseconds: 300);
   static const Duration _retryDelay = Duration(milliseconds: 150);
   static const int _maxNotifyAttempts = 6;

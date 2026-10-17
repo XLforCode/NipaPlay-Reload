@@ -1,0 +1,80 @@
+name: BiliCache test packages
+on:
+  push:
+    branches: [codex/bilicache]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+  id-token: write
+concurrency:
+  group: bilicache-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  protocol:
+    name: Protocol and native bridge (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-2022, macos-14, macos-26]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: tools/bilicache_bridge
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: '3.12.2'
+      - run: dart pub get
+      - run: dart analyze --fatal-infos
+      - run: dart test --reporter expanded
+      - name: Compile Windows bridge
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory build -Force | Out-Null
+          dart compile exe bin/bilicache_bridge.dart -o build/bilicache_bridge.exe
+          dart compile exe bin/setup.dart -o build/bilicache_setup.exe
+          Copy-Item install-windows.ps1,README.md build/
+          Get-ChildItem build -File | Get-FileHash -Algorithm SHA256 | ConvertTo-Json | Set-Content build/SHA256.json
+          dart run test/native_smoke.dart
+          Compress-Archive -Path build/* -DestinationPath bilicache-bridge-Windows-${{ runner.arch }}.zip
+      - name: Compile macOS bridge (personal test build)
+        if: runner.os == 'macOS'
+        run: |
+          mkdir -p build
+          dart compile exe bin/bilicache_bridge.dart -o build/bilicache_bridge
+          dart compile exe bin/setup.dart -o build/bilicache_setup
+          codesign --force --sign - build/bilicache_bridge
+          codesign --force --sign - build/bilicache_setup
+          cp install-macos.command README.md build/
+          chmod +x build/install-macos.command
+          shasum -a 256 build/* > build/SHA256.txt
+          tar -czf bilicache-bridge-macOS-${{ runner.arch }}.tar.gz -C build .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bilicache-bridge-${{ runner.os }}-${{ runner.arch }}
+          path: |
+            tools/bilicache_bridge/bilicache-bridge-*.zip
+            tools/bilicache_bridge/bilicache-bridge-*.tar.gz
+  player-tests:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: ./.github/actions/setup-flutter
+      - name: Analyze BiliCache integration
+        run: flutter analyze --no-pub --no-fatal-infos --no-fatal-warnings lib/services/rust_file_scan_service.dart lib/utils/video_player_state.dart lib/main.dart lib/themes/nipaplay/widgets/library_management_tab.dart
+      - name: Run player policy and XML regressions
+        run: flutter test --no-pub test/bilicache_cache_test.dart test/danmaku_xml_utils_test.dart test/danmaku_auto_load_strategy_test.dart
+  windows-player:
+    needs: [protocol, player-tests]
+    uses: ./.github/workflows/build-windows.yml
+  macos-player:
+    needs: [protocol, player-tests]
+    uses: ./.github/workflows/build-macos.yml
+    with:
+      architectures: '["arm64", "x86_64"]'
+      unsigned: true

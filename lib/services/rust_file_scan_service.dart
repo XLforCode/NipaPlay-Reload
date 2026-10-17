@@ -1,4 +1,6 @@
 import 'package:flutter/foundation.dart';
+import 'package:bilicache_protocol/bilicache_protocol.dart' as bilicache;
+import 'package:path/path.dart' as p;
 import 'package:nipaplay/src/rust/api/file_scan.dart' as rust;
 import 'package:nipaplay/src/rust/rust_init.dart';
 
@@ -45,15 +47,26 @@ class RustFileScanService {
           .toList(growable: false),
     );
 
+    final allowed = <String>{};
+    for (final file in diff.currentFiles) {
+      if (await bilicache.shouldIncludeCacheVideo(p.join(folderPath, file)))
+        allowed.add(file);
+    }
+    final deleted = {
+      ...diff.deletedFiles,
+      ...cachedHashes.keys.where((file) => !allowed.contains(file)),
+    }.toList()..sort();
     return RustFileScanResult(
-      currentCount: diff.currentCount,
+      currentCount: allowed.length,
       cachedCount: diff.cachedCount,
-      currentFiles: List<String>.from(diff.currentFiles),
-      newFiles: List<String>.from(diff.newFiles),
-      modifiedFiles: List<String>.from(diff.modifiedFiles),
-      deletedFiles: List<String>.from(diff.deletedFiles),
+      currentFiles: diff.currentFiles.where(allowed.contains).toList(),
+      newFiles: diff.newFiles.where(allowed.contains).toList(),
+      modifiedFiles: diff.modifiedFiles.where(allowed.contains).toList(),
+      deletedFiles: deleted,
       currentHashes: {
-        for (final entry in diff.currentHashes) entry.relativePath: entry.hash,
+        for (final entry in diff.currentHashes)
+          if (allowed.contains(entry.relativePath))
+            entry.relativePath: entry.hash,
       },
     );
   }

@@ -1,5 +1,7 @@
 library video_player_state;
 
+import 'package:bilicache_protocol/bilicache_protocol.dart' as bilicache;
+
 export 'video_aspect_geometry.dart' show VideoAspectMode;
 export 'screenshot_encoding.dart' show ScreenshotFormat;
 

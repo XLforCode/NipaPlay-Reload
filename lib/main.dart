@@ -208,6 +208,11 @@ void main(List<String> args) async {
     debugPaintSizeEnabled = false;
   });
 
+  // Cold macOS startup must restore directory grants before file existence
+  // checks or external-open dispatch.
+  if (!kIsWeb && Platform.isMacOS) {
+    await SecurityBookmarkService.restoreAllBookmarks();
+  }
   String? launchFilePath;
   String? startupScriptPath;
   String? startupCommandError;
@@ -462,14 +467,7 @@ void main(List<String> args) async {
   // 初始化插件系统覆盖设置
   await PluginService.loadDownloaderOverride();
 
-  // 初始化安全书签服务 (仅限 macOS)
-  if (!kIsWeb && Platform.isMacOS) {
-    try {
-      await SecurityBookmarkService.restoreAllBookmarks();
-    } catch (e) {
-      debugPrint('SecurityBookmarkService 书签恢复失败: $e');
-    }
-  }
+  // macOS bookmarks were restored before startup file handling above.
 
   // 并行执行初始化操作
   await Future.wait(<Future<dynamic>>[

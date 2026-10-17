@@ -29,7 +29,10 @@ Future<Map<String, dynamic>> readLocalDanmakuFile(XFile file) async {
 }
 
 /// 手动导入与同名自动加载共用的解析入口，不依赖文件扩展名或本地路径。
-Map<String, dynamic> parseLocalDanmakuBytes(Uint8List bytes) {
+Map<String, dynamic> parseBiliCacheDanmakuBytes(Uint8List bytes) =>
+    parseLocalDanmakuBytes(bytes, allowEmpty: true);
+
+Map<String, dynamic> parseLocalDanmakuBytes(Uint8List bytes, {bool allowEmpty = false}) {
   String content;
   if (bytes.length >= 2 &&
       ((bytes[0] == 0xff && bytes[1] == 0xfe) ||
@@ -71,6 +74,6 @@ Map<String, dynamic> parseLocalDanmakuBytes(Uint8List bytes) {
   if (comments is! List) {
     throw const FormatException('弹幕文件必须包含 comments/data 数组或 XML 弹幕');
   }
-  if (comments.isEmpty) throw const FormatException('弹幕文件中没有弹幕数据');
+  if (comments.isEmpty && !allowEmpty) throw const FormatException('弹幕文件中没有弹幕数据');
   return {'comments': comments, 'count': comments.length};
 }

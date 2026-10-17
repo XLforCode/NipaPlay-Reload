@@ -115,18 +115,8 @@ class AppDelegate: FlutterAppDelegate {
       return
     }
     
-    if !isFlutterReady() {
-      print("[AppDelegate] Flutter未准备好，保存文件路径")
-      pendingFilePath = filename
-      DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-        if let savedPath = self.pendingFilePath {
-          self.sendFileToFlutter(savedPath)
-          self.pendingFilePath = nil
-        }
-      }
-    } else {
-      sendFileToFlutter(filename)
-    }
+    pendingFilePaths.append(filename)
+    drainPendingFiles()
   }
   
   private func isSupportedVideoFile(_ filename: String) -> Bool {
@@ -135,33 +125,48 @@ class AppDelegate: FlutterAppDelegate {
     return supportedExtensions.contains(fileExtension)
   }
   
-  private func isFlutterReady() -> Bool {
-    guard let _ = self.mainFlutterWindow?.nipaplayFlutterViewController else {
-      return false
-    }
-    return true
-  }
-  
-  private func sendFileToFlutter(_ filename: String) {
-    print("[AppDelegate] 发送文件到Flutter: \(filename)")
-    
+  // The Flutter controller can exist before Dart installs its channel handler.
+  // Retain cold-start open events until the channel acknowledges them; an
+  // arbitrary one-second delay used to silently drop those events.
+  private var pendingFilePaths: [String] = []
+  private var dispatchingFile = false
+  private var pendingFileAttempts = 0
+
+  private func drainPendingFiles() {
+    guard !dispatchingFile, let filename = pendingFilePaths.first else { return }
+    dispatchingFile = true
     guard let controller = self.mainFlutterWindow?.nipaplayFlutterViewController else {
-      print("[AppDelegate] 错误: 无法获取Flutter控制器")
+      retryPendingFile()
       return
     }
-    
     let channel = FlutterMethodChannel(name: "drag_drop_channel", binaryMessenger: controller.engine.binaryMessenger)
-    
     channel.invokeMethod("onFilesDropped", arguments: ["files": [filename]]) { result in
-      if let error = result as? FlutterError {
-        print("[AppDelegate] 发送文件到Flutter失败: \(error.message ?? "未知错误")")
+      if result is FlutterError || (result as? NSObject) == FlutterMethodNotImplemented {
+        self.retryPendingFile()
       } else {
-        print("[AppDelegate] 文件已发送到Flutter")
+        self.pendingFilePaths.removeFirst()
+        self.pendingFileAttempts = 0
+        self.dispatchingFile = false
+        self.drainPendingFiles()
       }
     }
   }
-  
-  private var pendingFilePath: String?
+
+  private func retryPendingFile() {
+    pendingFileAttempts += 1
+    if pendingFileAttempts >= 120 {
+      pendingFilePaths.removeFirst()
+      pendingFileAttempts = 0
+      dispatchingFile = false
+      showSimpleAlert(message: "播放器尚未准备好，请重新打开缓存文件")
+      drainPendingFiles()
+      return
+    }
+    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+      self.dispatchingFile = false
+      self.drainPendingFiles()
+    }
+  }
 
   // MARK: - Helpers
 

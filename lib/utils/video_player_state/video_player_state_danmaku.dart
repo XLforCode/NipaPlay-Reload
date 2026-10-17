@@ -157,6 +157,27 @@ extension VideoPlayerStateDanmaku on VideoPlayerState {
         _currentVideoPath == targetVideoPath &&
         _playbackGeneration == targetGeneration;
 
+    // Managed caches never fall back to fuzzy matching, including empty XML.
+    try {
+      final cache = await bilicache.probeCacheVideo(videoPath, hashes: false);
+      if (cache != null) {
+        await cache.entry.danmaku.verify(cache.danmakuPath);
+        final data = await compute(parseBiliCacheDanmakuBytes,
+            await File(cache.danmakuPath).readAsBytes());
+        if (!canContinue()) return false;
+        if (_countLocalDanmakuComments(data) > 0) {
+          await loadDanmakuFromLocal(data,
+            trackName: _dedupeLocalTrackName(p.basenameWithoutExtension(cache.danmakuPath)),
+            sourceFilePath: cache.danmakuPath, setStatusMessage: false);
+        }
+        return true;
+      }
+    } catch (error) {
+      if (canContinue()) _addStatusMessage('BiliCache 弹幕不可用，请在扩展中检查缓存');
+      debugPrint('BiliCache local XML: $error');
+      return false;
+    }
+
     try {
       final dirPath = p.dirname(videoPath);
       final dir = Directory(dirPath);

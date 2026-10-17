@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:bilicache_protocol/bilicache_protocol.dart' as bilicache;
 import 'package:flutter/cupertino.dart' as cupertino;
 import 'package:flutter/material.dart';
 import 'package:nipaplay/media_library/pick_local_media_directory.dart';
@@ -883,7 +884,9 @@ class _LibraryManagementTabState extends State<LibraryManagementTab> {
             } else if (entity is io.File) {
               String extension = p.extension(entity.path).toLowerCase();
               if (extension == '.mp4' || extension == '.mkv') {
-                contents.add(entity);
+                if (await bilicache.shouldIncludeCacheVideo(entity.path)) {
+                  contents.add(entity);
+                }
               }
             }
           }
