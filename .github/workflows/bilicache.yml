@@ -76,5 +76,5 @@ jobs:
     needs: [protocol, player-tests]
     uses: ./.github/workflows/build-macos.yml
     with:
-      architectures: '["arm64", "x86_64"]'
+      architectures: '["universal"]'
       unsigned: true

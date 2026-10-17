@@ -403,7 +403,16 @@ runs:
             exit 1
           fi
         else
-          echo "⏭️ 跳过应用签名（未提供证书）"
+          # Personal builds still carry the existing sandbox entitlements.
+          # Ad-hoc signing does not claim Developer ID signing/notarization.
+          while IFS='|' read -r variant_key xcode_archs artifact_label variant_suffix; do
+            APP_PATH="${MACOS_STAGING_ROOT}/${variant_suffix}/NipaPlay.app"
+            codesign --force --deep --sign - \
+              --entitlements macos/Runner/Release.entitlements "$APP_PATH"
+            codesign --verify --deep --strict "$APP_PATH"
+            codesign -d --entitlements - "$APP_PATH" 2>/dev/null > "$RUNNER_TEMP/adhoc-${variant_key}.plist"
+            test "$(/usr/libexec/PlistBuddy -c 'Print :com.apple.security.app-sandbox' "$RUNNER_TEMP/adhoc-${variant_key}.plist")" = true
+          done < "$MACOS_VARIANTS_FILE"
         fi
 
     - name: Notarize macOS App

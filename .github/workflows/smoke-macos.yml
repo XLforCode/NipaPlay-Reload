@@ -48,7 +48,7 @@ jobs:
           # Keep the original Developer ID signature on release builds.
           APP="$RUNNER_TEMP/app/NipaPlay.app"
           if [ "$UNSIGNED" = true ]; then
-            codesign --force --deep --sign - "$APP"
+            codesign --force --deep --sign - --entitlements macos/Runner/Release.entitlements "$APP"
           fi
           codesign --verify --deep --strict "$APP"
       - name: Compile window observation helper
