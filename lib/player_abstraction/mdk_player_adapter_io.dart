@@ -481,7 +481,17 @@ class MdkPlayerAdapter
   @override
   Future<void> prepare() async {
     try {
-      _mdkPlayer.prepare();
+      // Native prepare decodes the first frame asynchronously. Returning
+      // early races reopen-after-EOF with texture creation on MDK.
+      final result =
+          await _mdkPlayer.prepare().timeout(const Duration(seconds: 30));
+      if (_isDisposed) {
+        throw StateError('MDK player was disposed during preparation');
+      }
+      if (result < 0 &&
+          !(result == -1 && _mdkPlayer.mediaInfo.streams > 0)) {
+        throw StateError('MDK media preparation failed ($result)');
+      }
       // prepare后重新应用播放速度，确保设置生效
       if (_playbackRate != 1.0) {
         _mdkPlayer.playbackRate = _playbackRate;

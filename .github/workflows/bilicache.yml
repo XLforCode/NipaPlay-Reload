@@ -9,7 +9,7 @@ permissions:
   id-token: write
 concurrency:
   group: bilicache-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 jobs:
   protocol:
     name: Protocol and native bridge (${{ matrix.os }})
@@ -68,7 +68,7 @@ jobs:
       - name: Analyze BiliCache integration
         run: flutter analyze --no-pub --no-fatal-infos --no-fatal-warnings lib/services/rust_file_scan_service.dart lib/utils/video_player_state.dart lib/main.dart lib/themes/nipaplay/widgets/library_management_tab.dart
       - name: Run player policy and XML regressions
-        run: flutter test --no-pub test/bilicache_cache_test.dart test/danmaku_xml_utils_test.dart test/danmaku_auto_load_strategy_test.dart
+        run: flutter test --no-pub test/bilicache_cache_test.dart test/danmaku_xml_utils_test.dart test/danmaku_auto_load_strategy_test.dart test/mdk_disposal_test.dart
   windows-player:
     needs: [protocol, player-tests]
     uses: ./.github/workflows/build-windows.yml

@@ -1813,7 +1813,8 @@ extension VideoPlayerStateDanmaku on VideoPlayerState {
   }
 
   void _applyTimelineDanmakuTrackForCurrentVideo() {
-    if (!_isTimelineDanmakuEnabled || _duration <= Duration.zero) {
+    if (_usesBiliCacheDanmaku ||
+        !_isTimelineDanmakuEnabled || _duration <= Duration.zero) {
       _danmakuTracks.remove('timeline');
       _danmakuTrackEnabled.remove('timeline');
       return;

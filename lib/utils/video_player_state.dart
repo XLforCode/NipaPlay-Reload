@@ -678,6 +678,7 @@ int _exactEndStreak = 0;
 
   // 时间轴告知弹幕轨道状态
   bool _isTimelineDanmakuEnabled = true;
+  bool _usesBiliCacheDanmaku = false;
 
   // 弹幕屏蔽词
   List<String> _danmakuBlockWords = []; // 弹幕屏蔽词列表

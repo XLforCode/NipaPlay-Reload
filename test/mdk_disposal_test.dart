@@ -6,6 +6,9 @@ import 'package:nipaplay/player_abstraction/mdk_player_adapter_io.dart';
 class _NativePlayer extends Fake implements mdk.Player {
   final completion = Completer<void>();
   int disposals = 0;
+  final prepared = Completer<int>();
+  @override
+  Future<int> prepare({int position = 0, mdk.SeekFlag flags = const mdk.SeekFlag(mdk.SeekFlag.defaultFlags), Future<bool> Function()? callback, bool reply = false}) => prepared.future;
   @override
   String media = '';
   @override
@@ -34,6 +37,26 @@ class _NativePlayer extends Fake implements mdk.Player {
 }
 
 void main() {
+  test('MDK preparation waits for the native first-frame result', () async {
+    final native = _NativePlayer();
+    final adapter = MdkPlayerAdapter.withPlayer(native);
+    var ready = false;
+    final result = adapter.prepare().then((_) { ready = true; });
+    await Future<void>.delayed(Duration.zero);
+    expect(ready, false);
+    native.prepared.complete(0);
+    await result;
+    expect(ready, true);
+    native.completion.complete(); await adapter.disposeAsync();
+  });
+  test('MDK reports a native preparation failure instead of creating a stale texture', () async {
+    final native = _NativePlayer();
+    final adapter = MdkPlayerAdapter.withPlayer(native);
+    final result = expectLater(adapter.prepare(), throwsStateError);
+    native.prepared.complete(-10);
+    await result;
+    native.completion.complete(); await adapter.disposeAsync();
+  });
   test('OHOS MDK status streams forward changes and cancel on teardown',
       () async {
     final source = StreamController<

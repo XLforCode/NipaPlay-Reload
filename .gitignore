@@ -69,3 +69,4 @@ docs/error.txt
 android/.kotlin/errors
 *.log
 /.codex_work
+/third_party/fvp/windows/mdk-sdk-windows-desktop-vs2022-x64.7z

@@ -991,10 +991,12 @@ extension VideoPlayerStatePlayerSetup on VideoPlayerState {
 
         if (!canContinue()) return;
         // Exact local cache XML takes precedence over global matching/history.
+        _usesBiliCacheDanmaku = false;
         try {
           final cache = kIsWeb ? null : await bilicache.probeCacheVideo(videoPath, hashes: false);
           if (!canContinue()) return;
           if (cache != null) {
+            _usesBiliCacheDanmaku = true;
             _clearDanmakuAutoLoadState();
             await _autoDetectAndLoadLocalDanmakuFromVideoDirectory(videoPath);
             if (!canContinue()) return;
@@ -1004,6 +1006,7 @@ extension VideoPlayerStatePlayerSetup on VideoPlayerState {
           }
         } catch (error) {
           if (!canContinue()) return;
+          _usesBiliCacheDanmaku = true;
           _clearDanmakuAutoLoadState();
           _addStatusMessage('BiliCache 缓存未完成或已变化，请在扩展中检查');
           _applyTimelineDanmakuTrackForCurrentVideo();
