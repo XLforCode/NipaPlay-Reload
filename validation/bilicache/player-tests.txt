@@ -1,0 +1,33 @@
+00:00 +0: loading C:/VibeCoding/NipaPlay-Reload/test/bilicache_cache_test.dart
+00:00 +0: C:/VibeCoding/NipaPlay-Reload/test/bilicache_cache_test.dart: zero-comment cache XML is valid while ordinary manual import keeps its validation
+00:00 +1: C:/VibeCoding/NipaPlay-Reload/test/bilicache_cache_test.dart: BiliCache scan only includes the current complete revision
+00:00 +2: C:/VibeCoding/NipaPlay-Reload/test/danmaku_xml_utils_test.dart: convertBilibiliXmlDanmakuToJson parses standard bilibili xml payloads
+[DanmakuParser] [C++] [ERR] parseXml: C++ exception, falling back to Dart
+[DanmakuParser] [C++] [ERR] convertBilibiliXml: C++ exception, falling back to Dart
+00:00 +3: C:/VibeCoding/NipaPlay-Reload/test/danmaku_xml_utils_test.dart: convertBilibiliXmlDanmakuToJson falls back for malformed xml text nodes
+[DanmakuParser] [C++] [ERR] parseXml: C++ exception, falling back to Dart
+[DanmakuParser] [C++] [ERR] convertBilibiliXml: C++ exception, falling back to Dart
+00:00 +4: C:/VibeCoding/NipaPlay-Reload/test/danmaku_auto_load_strategy_test.dart: DanmakuAutoLoadStrategy serializes to preference values
+00:00 +5: C:/VibeCoding/NipaPlay-Reload/test/danmaku_auto_load_strategy_test.dart: DanmakuAutoLoadStrategy parses persisted preference values
+00:00 +6: C:/VibeCoding/NipaPlay-Reload/test/danmaku_auto_load_strategy_test.dart: DanmakuAutoLoadStrategy migrates from legacy auto-match setting
+00:00 +7: C:/VibeCoding/NipaPlay-Reload/test/danmaku_auto_load_strategy_test.dart: DanmakuAutoLoadStrategy resolves legacy manual strategy into the standalone skip switch
+00:00 +8: C:/VibeCoding/NipaPlay-Reload/test/danmaku_auto_load_strategy_test.dart: DanmakuAutoLoadStrategy explicit skip preference overrides the legacy manual value
+00:02 +9: C:/VibeCoding/NipaPlay-Reload/test/mdk_disposal_test.dart: MDK preparation waits for the native first-frame result
+[KernelSwapTrace] [2026-10-17T14:41:39.286534] mdk teardown: begin
+[KernelSwapTrace] [2026-10-17T14:41:39.288493] mdk teardown: complete
+00:03 +10: C:/VibeCoding/NipaPlay-Reload/test/mdk_disposal_test.dart: MDK reports a native preparation failure instead of creating a stale texture
+[KernelSwapTrace] [2026-10-17T14:41:39.293940] mdk teardown: begin
+[KernelSwapTrace] [2026-10-17T14:41:39.293940] mdk teardown: complete
+00:03 +11: C:/VibeCoding/NipaPlay-Reload/test/mdk_disposal_test.dart: OHOS MDK status streams forward changes and cancel on teardown
+00:03 +12: C:/VibeCoding/NipaPlay-Reload/test/mdk_disposal_test.dart: MDK buffering follows native status and ignores post-dispose events
+[KernelSwapTrace] [2026-10-17T14:41:39.297875] mdk teardown: begin
+[KernelSwapTrace] [2026-10-17T14:41:39.297875] mdk teardown: complete
+00:03 +13: C:/VibeCoding/NipaPlay-Reload/test/mdk_disposal_test.dart: MDK samples buffering already active when the adapter attaches
+[KernelSwapTrace] [2026-10-17T14:41:39.300900] mdk teardown: begin
+[KernelSwapTrace] [2026-10-17T14:41:39.300900] mdk teardown: complete
+00:03 +14: C:/VibeCoding/NipaPlay-Reload/test/mdk_disposal_test.dart: media changes reuse MDK and teardown waits for the native future once
+[KernelSwapTrace] [2026-10-17T14:41:39.302855] mdk teardown: begin
+[KernelSwapTrace] [2026-10-17T14:41:39.302855] mdk teardown: complete
+00:03 +15: C:/VibeCoding/NipaPlay-Reload/test/mdk_disposal_test.dart: native errors remain errors on repeated disposal
+[KernelSwapTrace] [2026-10-17T14:41:39.306317] mdk teardown: begin
+00:03 +16: All tests passed!

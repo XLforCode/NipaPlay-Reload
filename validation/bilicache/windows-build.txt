@@ -1,0 +1,14 @@
+Building Windows application...                                 
+FVP_DEPS_LATEST=
+Nuget.exe not found, trying to download or use cached version.
+CMake Deprecation Warning at flutter/ephemeral/.plugin_symlinks/nipaplay_smb2/third_party/libsmb2/CMakeLists.txt:11 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+
+
+Building Windows application...                                    74.7s
+√ Built build\windows\x64\runner\Release\NipaPlay.exe
